@@ -17,6 +17,10 @@ def parse_args():
                         default='{}', 
                         help='Tuner parameter dictionary, type is JSON string')
     # common settings
+    parser.add_argument('--config_file', 
+                        type=str, 
+                        default='mf_small', 
+                        help='config json file')
     parser.add_argument('--problem_type', 
                         type=str, 
                         default='point', 
