@@ -339,20 +339,20 @@ if __name__ == '__main__':
         return -score
 
     ''' Test Process for Metrics Exporting '''
-    df, user_num, item_num = load_rate(args.dataset, args.prepro, binary=True)
-    train_set, test_set = split_test(df, args.test_method, args.test_size)
+    # df, user_num, item_num = load_rate(args.dataset, args.prepro, binary=True)
+    # train_set, test_set = split_test(df, args.test_method, args.test_size)
     # temporary used for tuning test result
-    # train_set = pd.read_csv(f'./experiment_data/train_{args.dataset}_{args.prepro}_{args.test_method}.dat')
-    # test_set = pd.read_csv(f'./experiment_data/test_{args.dataset}_{args.prepro}_{args.test_method}.dat')
+    train_set = pd.read_csv(f'./experiment_data/train_{args.dataset}_{args.prepro}_{args.test_method}.dat')
+    test_set = pd.read_csv(f'./experiment_data/test_{args.dataset}_{args.prepro}_{args.test_method}.dat')
     if args.dataset in ['yelp']:
         train_set['timestamp'] = pd.to_datetime(train_set['timestamp'])
         test_set['timestamp'] = pd.to_datetime(test_set['timestamp'])
-    # df = pd.concat([train_set, test_set], ignore_index=True)
-    # user_num = df['user'].nunique()
-    # item_num = df['item'].nunique()
+    df = pd.concat([train_set, test_set], ignore_index=True)
+    user_num = df['user'].nunique()
+    item_num = df['item'].nunique()
 
-    # train_set['rating'] = 1.0
-    # test_set['rating'] = 1.0
+    train_set['rating'] = 1.0
+    test_set['rating'] = 1.0
 
     # initial candidate item pool
     item_pool = set(range(item_num))
@@ -378,8 +378,10 @@ if __name__ == '__main__':
 
     # param_limit = param_extract(args)
     # param_dict = confirm_space(param_limit)
-    param_dict = json.loads(args.tune_pack)
-
+    # param_dict = json.loads(args.tune_pack)
+    config_path = './config/' + f'{args.config_file}_config.json'
+    with open(config_path, 'r') as load_f:
+        param_dict = json.load(load_f)
     space = dict()
     for key, val in param_dict.items():
         if val[3] == 'int':
