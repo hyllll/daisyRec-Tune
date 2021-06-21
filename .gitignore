@@ -60,7 +60,7 @@ coverage.xml
 *.csv
 *.dat
 *.tar
-*.json
+#*.json
 .DS_Store
 *.pt
 *.pkl
