@@ -66,9 +66,9 @@ val_methods = [
     {'name': 'cv'},
 ]
 sample_methods = [
-    {'name': 'uniform'},
-    {'name': 'item-ascd'},
-    {'name': 'item-desc'},
+    {'name': 'uniform (uniformly sampling)'},
+    {'name': 'item-ascd (sampling popular items with low rank)'},
+    {'name': 'item-desc (sampling popular item with high rank)'},
 ]
 loss_types = [
     {'name': 'CL (Cross-entropy Loss)'},

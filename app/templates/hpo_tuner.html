@@ -224,6 +224,7 @@
             tmp = $('#cand_num').val()
             base += ' --cand_num=' + tmp
             tmp = $('#sample_method').val()
+            tmp = tmp.split(' ')[0]
             base += ' --sample_method=' + tmp
             tmp = $('#sample_ratio').val()
             base += ' --sample_ratio=' + tmp
