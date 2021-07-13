@@ -211,6 +211,7 @@
             tmp = $('#topk').val()
             base += ' --topk=' + tmp
             tmp = $('#test_method').val()
+            tmp = tmp.split('')[0]
             base += ' --test_method=' + tmp
             tmp = $('#val_method').val()
             base += ' --val_method=' + tmp
@@ -231,6 +232,7 @@
             tmp = $('#gpu').val()
             base += ' --gpu=' + tmp
             tmp = $('#loss_type').val()
+            tmp = tmp.split('')[0]
             base += ' --loss_type=' + tmp
 
             param_dict = {}

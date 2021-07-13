@@ -49,12 +49,12 @@ preprocess_methods = [
     {'name': '10core'},
 ]
 test_methods = [
-    {'name': 'tloo'},
-    {'name': 'loo'},
-    {'name': 'tfo'},
-    {'name': 'tfo'},
-    {'name': 'utfo'},
-    {'name': 'ufo'},
+    {'name': 'tloo (time-aware leave one out)'},
+    {'name': 'loo (leave one out)'},
+    {'name': 'tfo (time-aware fold-out)'},
+    {'name': 'fo (fold-out)'},
+    {'name': 'utfo (time-aware fold-out withuser-level)'},
+    {'name': 'ufo (fold-out with user-level)'},
 ]
 val_methods = [
     {'name': 'tloo'},
@@ -71,11 +71,11 @@ sample_methods = [
     {'name': 'item-desc'},
 ]
 loss_types = [
-    {'name': 'CL'},
-    {'name': 'SL'},
-    {'name': 'BPR'},
-    {'name': 'HL'},
-    {'name': 'TL'},
+    {'name': 'CL (Cross-entropy Loss)'},
+    {'name': 'SL (Square Loss)'},
+    {'name': 'BPR (BPR Loss)'},
+    {'name': 'HL (Hinge Loss)'},
+    {'name': 'TL (Top-1 Loss)'},
 ]
 
 @app.route('/')
