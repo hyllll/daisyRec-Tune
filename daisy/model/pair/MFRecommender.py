@@ -95,7 +95,7 @@ class PairMF(nn.Module):
                 pred_i, pred_j = self.forward(user, item_i, item_j)
 
                 if self.loss_type == 'BPR':
-                    loss = -(pred_i - pred_j).sigmoid().log().sum()
+                    loss = -((pred_i - pred_j).sigmoid() + 1e-24).log().sum()
                 elif self.loss_type == 'HL':
                     loss = torch.clamp(1 - (pred_i - pred_j) * label, min=0).sum()
                 elif self.loss_type == 'TL': # TOP1-loss
