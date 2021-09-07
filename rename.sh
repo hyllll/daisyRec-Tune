@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ./experiment_datasets
+cd ./experiment_datasets/
 for file_a in `ls *.dat`;do
     string=${file_a}
      array=(${string//_/ })
