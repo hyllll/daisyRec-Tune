@@ -225,7 +225,8 @@ if __name__ == '__main__':
         train_dataset, 
         batch_size=args.batch_size, 
         shuffle=True, 
-        num_workers=4
+        num_workers=4,
+        pin_memory=True,
     )
 
     # build recommender model
