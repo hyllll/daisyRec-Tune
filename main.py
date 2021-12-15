@@ -15,7 +15,7 @@ from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.data import PointData, PairData, UAEData
 from daisy.utils.splitter import split_test, split_validation
-from daisy.utils.opt_toolkit import param_extract, confirm_space
+# from daisy.utils.opt_toolkit import param_extract, confirm_space
 from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
