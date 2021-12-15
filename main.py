@@ -16,7 +16,7 @@ from daisy.utils.parser import parse_args
 from daisy.utils.data import PointData, PairData, UAEData
 from daisy.utils.splitter import split_test, split_validation
 # from daisy.utils.opt_toolkit import param_extract, confirm_space
-from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set
+from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, get_adj_mat, build_candidates_set
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
 if __name__ == '__main__':
@@ -46,6 +46,9 @@ if __name__ == '__main__':
         # num_ng is a special paramter, not be used together with those above
         num_ng = int(space['num_ng']) if 'num_ng' in space.keys() else args.num_ng
         batch_size = int(space['batch_size']) if 'batch_size' in space.keys() else args.batch_size
+        node_dropout = space['node_dropout'] if 'node_dropout' in space.keys() else args.node_dropout
+        mess_dropout = space['mess_dropout'] if 'mess_dropout' in space.keys() else args.mess_dropout
+        
 
         # declare a list to store metric score in order to use as target for optimization
         fnl_metric = []
@@ -241,6 +244,24 @@ if __name__ == '__main__':
                         loss_type=args.loss_type,
                         gpuid=args.gpu
                     )
+                elif args.alog_name == 'ngcf':
+                    from daisy.model.pair.NGCFRecommender import NGCF
+                    plain_adj, norm_adj, mean_adj = train_dataset.get_adj_mat(user_num,item_num)
+                    model = NGCF(
+                        user_num,
+                        item_num,
+                        norm_adj=norm_adj,
+                        factors=factors,
+                        batch_size=batch_size,
+                        node_dropout=node_dropout,
+                        mess_dropout=mess_dropout,
+                        lr=lr,
+                        reg_2=reg_2,
+                        epochs=args.epochs,
+                        node_dropout_flag=args.node_dropout_flag,
+                        loss_type=args.loss_type,
+                        gpuid=args.gpu
+                    )
                 elif args.algo_name == 'deepfm':
                     pass
                 elif args.algo_name == 'afm':
@@ -332,7 +353,11 @@ if __name__ == '__main__':
 
         # record all tuning result and settings
         fnl_metric = [f'{mt:.4f}' for mt in fnl_metric]
-        line = ','.join(fnl_metric) + f',{num_ng},{factors},{num_layers},{dropout},{lr},{batch_size},{reg_1},{reg_2},{kl_reg}' + '\n'
+        if args.algo_name == 'ngcf':
+            # f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,node_dropout,mess_dropout,lr,lamda,batch_size,layer_size' + '\n')
+            line = ','.join(fnl_metric) + f',{num_ng},{factors},{node_dropout},{mess_dropout},{lr},{reg_2},{batch_size},{reg_2}' + '\n'
+        else:
+            line = ','.join(fnl_metric) + f',{num_ng},{factors},{num_layers},{dropout},{lr},{batch_size},{reg_1},{reg_2},{kl_reg}' + '\n'
         f.write(line)
         f.flush()
 
@@ -373,7 +398,10 @@ if __name__ == '__main__':
     f = open(tune_log_path + f'{args.loss_type}_{args.algo_name}_{args.dataset}_{args.prepro}_{args.val_method}.csv', 
             'w', 
             encoding='utf-8')
-    f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,num_layers,dropout,lr,batch_size,reg_1,reg_2,kl_reg' + '\n')
+    if args.algo_name == 'ngcf':
+        f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,node_dropout,mess_dropout,lr,lamda,batch_size' + '\n')
+    else:
+        f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,num_layers,dropout,lr,batch_size,reg_1,reg_2,kl_reg' + '\n')
     f.flush()
 
     # param_limit = param_extract(args)
