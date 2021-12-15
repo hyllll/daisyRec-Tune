@@ -125,6 +125,22 @@ def parse_args():
                         type=int, 
                         default=2, 
                         help='number of layers in MLP model')
+    parser.add_argument('--layer_size', 
+                        nargs='?', 
+                        default='[64,64,64]',
+                        help='NDCG: Output sizes of every layer')
+    parser.add_argument('--node_dropout_flag', 
+                        type=int, 
+                        default=1,
+                        help='NDCG: 0: Disable node dropout, 1: Activate node dropout')
+    parser.add_argument('--node_dropout', 
+                        nargs='?', 
+                        default=0.1,
+                        help='NDCG: Keep probability w.r.t. node dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
+    parser.add_argument('--mess_dropout', 
+                        nargs='?', 
+                        default=0.1,
+                        help='NDCG: Keep probability w.r.t. message dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
     parser.add_argument('--act_func', 
                         type=str, 
                         default='relu', 
