@@ -6,6 +6,7 @@ import random
 import numpy as np
 import pandas as pd
 import scipy.io as sio
+import scipy.sparse as sp
 
 from collections import defaultdict
 
@@ -323,6 +324,68 @@ def convert_npy_mat(user_num, item_num, df):
         u, i, r = row['user'], row['item'], row['rating']
         mat[int(u), int(i)] = float(r)
     return mat
+
+
+def get_adj_mat(n_users, n_items):
+    """
+    method of get Adjacency matrix
+    Parameters
+    --------
+    n_users : int, the number of users
+    n_items : int, the number of items
+
+    Returns
+    -------
+    adj_mat: adjacency matrix
+    norm_adj_mat: normal adjacency matrix
+    mean_adj_mat: mean adjacency matrix
+    """
+    R = sp.dok_matrix((n_users, n_items), dtype=np.float32)
+    adj_mat = sp.dok_matrix((n_users + n_items, n_users + n_items), dtype=np.float32)
+    adj_mat = adj_mat.tolil()
+    R = R.tolil()
+
+    adj_mat[:n_users, n_users:] = R
+    adj_mat[n_users:, :n_users] = R.T
+    adj_mat = adj_mat.todok()
+
+    def mean_adj_single(adj):
+        # D^-1 * A
+        rowsum = np.array(adj.sum(1))
+
+        d_inv = np.power(rowsum, -1).flatten()
+        d_inv[np.isinf(d_inv)] = 0.
+        d_mat_inv = sp.diags(d_inv)
+
+        norm_adj = d_mat_inv.dot(adj)
+        # norm_adj = adj.dot(d_mat_inv)
+        print('generate single-normalized adjacency matrix.')
+        return norm_adj.tocoo()
+    
+    def normalized_adj_single(adj):
+        # D^-1/2 * A * D^-1/2
+        rowsum = np.array(adj.sum(1))
+
+        d_inv_sqrt = np.power(rowsum, -0.5).flatten()
+        d_inv_sqrt[np.isinf(d_inv_sqrt)] = 0.
+        d_mat_inv_sqrt = sp.diags(d_inv_sqrt)
+
+        # bi_lap = adj.dot(d_mat_inv_sqrt).transpose().dot(d_mat_inv_sqrt)
+        bi_lap = d_mat_inv_sqrt.dot(adj).dot(d_mat_inv_sqrt)
+        return bi_lap.tocoo()
+    
+    def check_adj_if_equal(adj):
+        dense_A = np.array(adj.todense())
+        degree = np.sum(dense_A, axis=1, keepdims=False)
+
+        temp = np.dot(np.diag(np.power(degree, -1)), dense_A)
+        print('check normalized adjacency matrix whether equal to this laplacian matrix.')
+        return temp
+    
+    norm_adj_mat = mean_adj_single(adj_mat + sp.eye(adj_mat.shape[0]))
+    # norm_adj_mat = normalized_adj_single(adj_mat + sp.eye(adj_mat.shape[0]))
+    mean_adj_mat = mean_adj_single(adj_mat)
+    return adj_mat.tocsr(), norm_adj_mat.tocsr(), mean_adj_mat.tocsr()
 
 
 def build_candidates_set(test_ur, train_ur, item_pool, candidates_num=1000):
