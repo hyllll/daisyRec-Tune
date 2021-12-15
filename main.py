@@ -366,7 +366,7 @@ if __name__ == '__main__':
 
     print('='*50, '\n')
     # begin tuning here
-    tune_log_path = './tune_log/'
+    tune_log_path = './res/tune_log/'
     if not os.path.exists(tune_log_path):
         os.makedirs(tune_log_path)
 
