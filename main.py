@@ -244,7 +244,7 @@ if __name__ == '__main__':
                         loss_type=args.loss_type,
                         gpuid=args.gpu
                     )
-                elif args.alog_name == 'ngcf':
+                elif args.algo_name == 'ngcf':
                     from daisy.model.pair.NGCFRecommender import NGCF
                     plain_adj, norm_adj, mean_adj = get_adj_mat(user_num,item_num)
                     model = NGCF(
