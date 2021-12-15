@@ -13,7 +13,7 @@ from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
 from daisy.utils.data import PointData, PairData, UAEData
-from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set
+from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, get_adj_mat, build_candidates_set
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
 
@@ -216,6 +216,24 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu
             )
+        elif args.algo_name == 'ngcf':
+            from daisy.model.pair.NGCFRecommender import NGCF
+            plain_adj, norm_adj, mean_adj = get_adj_mat(user_num,item_num)
+            model = NGCF(
+                        user_num,
+                        item_num,
+                        norm_adj=norm_adj,
+                        factors=args.factors,
+                        batch_size=args.batch_size,
+                        node_dropout=args.node_dropout,
+                        mess_dropout=args.mess_dropout,
+                        lr=args.lr,
+                        reg_2=args.reg_2,
+                        epochs=args.epochs,
+                        node_dropout_flag=args.node_dropout_flag,
+                        loss_type=args.loss_type,
+                        gpuid=args.gpu
+                    )
         else:
             raise ValueError('Invalid algorithm name')
     else:

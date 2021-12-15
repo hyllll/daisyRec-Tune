@@ -246,7 +246,7 @@ if __name__ == '__main__':
                     )
                 elif args.alog_name == 'ngcf':
                     from daisy.model.pair.NGCFRecommender import NGCF
-                    plain_adj, norm_adj, mean_adj = train_dataset.get_adj_mat(user_num,item_num)
+                    plain_adj, norm_adj, mean_adj = get_adj_mat(user_num,item_num)
                     model = NGCF(
                         user_num,
                         item_num,
