@@ -57,7 +57,7 @@ class NGCF(nn.Module):
         else:
             self.sparse_norm_adj=self.sparse_norm_adj.cpu()
     
-    def init_weight():
+    def init_weight(self):
         initializer = nn.init.xavier_uniform_
 
         embedding_dict = nn.ParameterDict({
