@@ -133,11 +133,13 @@ def parse_args():
                         type=int, 
                         default=1,
                         help='NGCF: 0: Disable node dropout, 1: Activate node dropout')
-    parser.add_argument('--node_dropout', 
+    parser.add_argument('--node_dropout',
+                        type=float,  
                         nargs='?', 
                         default=0.1,
                         help='NGCF: Keep probability w.r.t. node dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
     parser.add_argument('--mess_dropout', 
+                        type=float, 
                         nargs='?', 
                         default=0.1,
                         help='NGCF: Keep probability w.r.t. message dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')

@@ -11,6 +11,9 @@ from hyperopt import hp, tpe, fmin
 import torch
 import torch.utils.data as data
 
+import warnings
+warnings.filterwarnings('ignore')
+
 from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.data import PointData, PairData, UAEData

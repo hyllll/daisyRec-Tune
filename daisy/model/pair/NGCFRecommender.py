@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
 from tqdm import tqdm
 
 
@@ -52,6 +53,7 @@ class NGCF(nn.Module):
         self.early_stop=early_stop
 
         self.embedding_dict, self.weight_dict = self.init_weight()
+        self.sparse_norm_adj = self._convert_sp_mat_to_sp_tensor(self.norm_adj)
         if torch.cuda.is_available():
             self.sparse_norm_adj=self.sparse_norm_adj.cuda()
         else:

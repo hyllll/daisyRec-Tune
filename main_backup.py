@@ -9,6 +9,9 @@ from collections import defaultdict
 import torch
 import torch.utils.data as data
 
+import warnings
+warnings.filterwarnings('ignore')
+
 from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
