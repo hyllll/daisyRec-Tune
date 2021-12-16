@@ -158,6 +158,13 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu
             )
+        elif args.algo_name == 'itemknn':
+            from daisy.model.KNNCFRecommender import ItemKNNCF
+            model = ItemKNNCF(
+                user_num,
+                item_num,
+                maxk= args.maxk
+            )
         else:
             raise ValueError('Invalid algorithm name')
     elif args.problem_type == 'pair':
@@ -242,17 +249,19 @@ if __name__ == '__main__':
     else:
         raise ValueError('Invalid problem type')
 
-    train_loader = data.DataLoader(
+    # build recommender model
+    s_time = time.time()
+    if args.algo_name in ['itemknn']:
+        model.fit(train_set)
+    else:
+        train_loader = data.DataLoader(
         train_dataset, 
         batch_size=args.batch_size, 
         shuffle=True, 
         num_workers=4,
-        pin_memory=True,
-    )
-
-    # build recommender model
-    s_time = time.time()
-    model.fit(train_loader)
+        pin_memory=True,)
+        
+        model.fit(train_loader)
     elapsed_time = time.time() - s_time
     time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
     time_log.close()
@@ -265,7 +274,7 @@ if __name__ == '__main__':
     print('Generate recommend list...')
     print('')
     preds = {}
-    if args.algo_name in ['vae', 'cdae'] and args.problem_type == 'point':
+    if args.algo_name in ['vae', 'cdae', 'itemknn'] and args.problem_type == 'point':
         for u in tqdm(test_ucands.keys()):
             pred_rates = [model.predict(u, i) for i in test_ucands[u]]
             rec_idx = np.argsort(pred_rates)[::-1][:args.topk]

@@ -125,6 +125,10 @@ def parse_args():
                         type=int, 
                         default=2, 
                         help='number of layers in MLP model')
+    parser.add_argument('--maxk', 
+                        type=int, 
+                        default=40, 
+                        help='The (max) number of neighbors to take into account')
     parser.add_argument('--layer_size', 
                         nargs='?', 
                         default='[64,64,64]',

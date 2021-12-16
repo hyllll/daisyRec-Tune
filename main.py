@@ -46,6 +46,7 @@ if __name__ == '__main__':
         kl_reg = space['kl_reg'] if 'kl_reg' in space.keys() else args.kl_reg
         num_layers = int(space['num_layers']) if 'num_layers' in space.keys() else args.num_layers
         dropout = space['dropout'] if 'dropout' in space.keys() else args.dropout
+        maxk = int(space['maxk']) if 'maxk' in space.keys() else args.maxk
         # num_ng is a special paramter, not be used together with those above
         num_ng = int(space['num_ng']) if 'num_ng' in space.keys() else args.num_ng
         batch_size = int(space['batch_size']) if 'batch_size' in space.keys() else args.batch_size
@@ -173,6 +174,12 @@ if __name__ == '__main__':
                 elif args.algo_name == 'userknn':
                     pass
                 elif args.algo_name == 'itemknn':
+                    from daisy.model.KNNCFRecommender import UserKNNCF
+                    model = UserKNNCF(
+                        user_num,
+                        item_num,
+                        maxk=maxk
+                    )
                     pass
                 elif args.algo_name == 'puresvd':
                     pass
@@ -273,15 +280,18 @@ if __name__ == '__main__':
                     raise ValueError('Invalid algorithm name')
             else:
                 raise ValueError('Invalid problem type')
-
-            train_loader = data.DataLoader(
+            
+            if args.algo_name in ['itemknn']:
+                model.fit(train)
+            else:
+                train_loader = data.DataLoader(
                 train_dataset, 
                 batch_size=batch_size, 
                 shuffle=True, 
-                num_workers=4
-            )
+                num_workers=4)
+                
+                model.fit(train_loader)
 
-            model.fit(train_loader)
             print('Start Calculating Metrics......')
             val_ucands = build_candidates_set(val_ur, train_ur, item_pool, candidates_num)
             # get predict result
@@ -289,7 +299,7 @@ if __name__ == '__main__':
             print('Generate recommend list...')
             print('')
             preds = {}
-            if args.algo_name in ['vae', 'cdae'] and args.problem_type == 'point':
+            if args.algo_name in ['vae', 'cdae', 'itemknn'] and args.problem_type == 'point':
                 for u in tqdm(val_ucands.keys()):
                     pred_rates = [model.predict(u, i) for i in val_ucands[u]]
                     rec_idx = np.argsort(pred_rates)[::-1][:topk]
@@ -359,6 +369,8 @@ if __name__ == '__main__':
         if args.algo_name == 'ngcf':
             # f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,node_dropout,mess_dropout,lr,lamda,batch_size,layer_size' + '\n')
             line = ','.join(fnl_metric) + f',{num_ng},{factors},{node_dropout},{mess_dropout},{lr},{reg_2},{batch_size},{reg_2}' + '\n'
+        elif args.algo_name == 'itemknn':
+            line = ','.join(fnl_metric) + f',{maxk}' + '\n'
         else:
             line = ','.join(fnl_metric) + f',{num_ng},{factors},{num_layers},{dropout},{lr},{batch_size},{reg_1},{reg_2},{kl_reg}' + '\n'
         f.write(line)
@@ -403,6 +415,8 @@ if __name__ == '__main__':
             encoding='utf-8')
     if args.algo_name == 'ngcf':
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,node_dropout,mess_dropout,lr,lamda,batch_size' + '\n')
+    elif args.algo_name == 'itemknn':
+        f.write('Pre,Rec,HR,MAP,MRR,NDCG,maxk' + '\n')
     else:
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,num_layers,dropout,lr,batch_size,reg_1,reg_2,kl_reg' + '\n')
     f.flush()
