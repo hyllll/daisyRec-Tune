@@ -180,9 +180,13 @@ if __name__ == '__main__':
                         item_num,
                         maxk=maxk
                     )
-                    pass
                 elif args.algo_name == 'puresvd':
-                    pass
+                    from daisy.model.PureSVDRecommender import PureSVD
+                    model = PureSVD(
+                        user_num,
+                        item_num,
+                        factors=factors,
+                    )
                 elif args.algo_name == 'afm':
                     pass
                 elif args.algo_name == 'deepfm':
@@ -281,7 +285,7 @@ if __name__ == '__main__':
             else:
                 raise ValueError('Invalid problem type')
             
-            if args.algo_name in ['itemknn']:
+            if args.algo_name in ['itemknn', 'puresvd']:
                 model.fit(train)
             else:
                 train_loader = data.DataLoader(
@@ -289,7 +293,7 @@ if __name__ == '__main__':
                 batch_size=batch_size, 
                 shuffle=True, 
                 num_workers=4)
-                
+
                 model.fit(train_loader)
 
             print('Start Calculating Metrics......')
@@ -299,7 +303,7 @@ if __name__ == '__main__':
             print('Generate recommend list...')
             print('')
             preds = {}
-            if args.algo_name in ['vae', 'cdae', 'itemknn'] and args.problem_type == 'point':
+            if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd'] and args.problem_type == 'point':
                 for u in tqdm(val_ucands.keys()):
                     pred_rates = [model.predict(u, i) for i in val_ucands[u]]
                     rec_idx = np.argsort(pred_rates)[::-1][:topk]
@@ -371,6 +375,8 @@ if __name__ == '__main__':
             line = ','.join(fnl_metric) + f',{num_ng},{factors},{node_dropout},{mess_dropout},{lr},{reg_2},{batch_size},{reg_2}' + '\n'
         elif args.algo_name == 'itemknn':
             line = ','.join(fnl_metric) + f',{maxk}' + '\n'
+        elif args.algo_name == 'puresvd':
+            line = ','.join(fnl_metric) + f',{factors}' + '\n'
         else:
             line = ','.join(fnl_metric) + f',{num_ng},{factors},{num_layers},{dropout},{lr},{batch_size},{reg_1},{reg_2},{kl_reg}' + '\n'
         f.write(line)
@@ -417,6 +423,8 @@ if __name__ == '__main__':
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,node_dropout,mess_dropout,lr,lamda,batch_size' + '\n')
     elif args.algo_name == 'itemknn':
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,maxk' + '\n')
+    elif args.algo_name == 'puresvd':
+        f.write('Pre,Rec,HR,MAP,MRR,NDCG,factors' + '\n')
     else:
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,num_layers,dropout,lr,batch_size,reg_1,reg_2,kl_reg' + '\n')
     f.flush()

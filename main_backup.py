@@ -165,6 +165,13 @@ if __name__ == '__main__':
                 item_num,
                 maxk= args.maxk
             )
+        elif args.algo_name == 'puresvd':
+            from daisy.model.PureSVDRecommender import PureSVD
+            model = PureSVD(
+                user_num,
+                item_num,
+                factors=args.factors
+            )
         else:
             raise ValueError('Invalid algorithm name')
     elif args.problem_type == 'pair':
@@ -251,7 +258,7 @@ if __name__ == '__main__':
 
     # build recommender model
     s_time = time.time()
-    if args.algo_name in ['itemknn']:
+    if args.algo_name in ['itemknn', 'puresvd']:
         model.fit(train_set)
     else:
         train_loader = data.DataLoader(
@@ -260,7 +267,7 @@ if __name__ == '__main__':
         shuffle=True, 
         num_workers=4,
         pin_memory=True,)
-        
+
         model.fit(train_loader)
     elapsed_time = time.time() - s_time
     time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
@@ -274,7 +281,7 @@ if __name__ == '__main__':
     print('Generate recommend list...')
     print('')
     preds = {}
-    if args.algo_name in ['vae', 'cdae', 'itemknn'] and args.problem_type == 'point':
+    if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd'] and args.problem_type == 'point':
         for u in tqdm(test_ucands.keys()):
             pred_rates = [model.predict(u, i) for i in test_ucands[u]]
             rec_idx = np.argsort(pred_rates)[::-1][:args.topk]
