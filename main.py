@@ -52,7 +52,8 @@ if __name__ == '__main__':
         batch_size = int(space['batch_size']) if 'batch_size' in space.keys() else args.batch_size
         node_dropout = space['node_dropout'] if 'node_dropout' in space.keys() else args.node_dropout
         mess_dropout = space['mess_dropout'] if 'mess_dropout' in space.keys() else args.mess_dropout
-        
+        alpha = space['alpha'] if 'alpha' in space.keys() else args.alpha
+        elastic = space['elastic'] if 'elastic' in space.keys() else args.elastic
 
         # declare a list to store metric score in order to use as target for optimization
         fnl_metric = []
@@ -196,7 +197,13 @@ if __name__ == '__main__':
                 elif args.algo_name == 'pop':
                     pass
                 elif args.algo_name == 'slim':
-                    pass
+                    from daisy.model.SLiMRecommender import SLIM
+                    model = SLIM(
+                        user_num,
+                        item_num,
+                        l1_ratio=elastic,
+                        alpha=alpha
+                    )
                 else:
                     raise ValueError('Invalid algorithm name')
             elif args.problem_type == 'pair':
@@ -285,7 +292,7 @@ if __name__ == '__main__':
             else:
                 raise ValueError('Invalid problem type')
             
-            if args.algo_name in ['itemknn', 'puresvd']:
+            if args.algo_name in ['itemknn', 'puresvd', 'slim']:
                 model.fit(train)
             else:
                 train_loader = data.DataLoader(
@@ -303,7 +310,7 @@ if __name__ == '__main__':
             print('Generate recommend list...')
             print('')
             preds = {}
-            if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd'] and args.problem_type == 'point':
+            if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point':
                 for u in tqdm(val_ucands.keys()):
                     pred_rates = [model.predict(u, i) for i in val_ucands[u]]
                     rec_idx = np.argsort(pred_rates)[::-1][:topk]
@@ -370,13 +377,14 @@ if __name__ == '__main__':
 
         # record all tuning result and settings
         fnl_metric = [f'{mt:.4f}' for mt in fnl_metric]
-        if args.algo_name == 'ngcf':
-            # f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,node_dropout,mess_dropout,lr,lamda,batch_size,layer_size' + '\n')
+        if args.algo_name == 'ngcf': 
             line = ','.join(fnl_metric) + f',{num_ng},{factors},{node_dropout},{mess_dropout},{lr},{reg_2},{batch_size},{reg_2}' + '\n'
         elif args.algo_name == 'itemknn':
             line = ','.join(fnl_metric) + f',{maxk}' + '\n'
         elif args.algo_name == 'puresvd':
             line = ','.join(fnl_metric) + f',{factors}' + '\n'
+        elif args.algo_name == 'slim':
+            line = ','.join(fnl_metric) + f',{alpha},{elastic}' + '\n'
         else:
             line = ','.join(fnl_metric) + f',{num_ng},{factors},{num_layers},{dropout},{lr},{batch_size},{reg_1},{reg_2},{kl_reg}' + '\n'
         f.write(line)
@@ -425,6 +433,8 @@ if __name__ == '__main__':
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,maxk' + '\n')
     elif args.algo_name == 'puresvd':
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,factors' + '\n')
+    elif args.algo_name == 'slim':
+        f.write('Pre,Rec,HR,MAP,MRR,NDCG,alpha,elastic' + '\n')
     else:
         f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,num_layers,dropout,lr,batch_size,reg_1,reg_2,kl_reg' + '\n')
     f.flush()
@@ -440,6 +450,9 @@ if __name__ == '__main__':
         if val[3] == 'int':
             print(key, 'quniform', val[0], val[1], int(val[2]))
             space[key] = hp.quniform(key, val[0], val[1], int(val[2]))
+        elif val[3] == 'uint':
+            print(key, 'uniform', val[0], val[1])
+            space[key] = hp.uniform(key, val[0], val[1])
         elif val[3] == 'float':
             print(key, 'loguniform', np.log(val[0]), np.log(val[1]))
             space[key] = hp.loguniform(key, np.log(val[0]), np.log(val[1]))

@@ -125,6 +125,14 @@ def parse_args():
                         type=int, 
                         default=2, 
                         help='number of layers in MLP model')
+    parser.add_argument('--alpha', 
+                        type=float, 
+                        default=0.02, 
+                        help='elastic net parameter')
+    parser.add_argument('--elastic', 
+                        type=float, 
+                        default=0.5, 
+                        help='ratio if lasso result, 0 for ridge-regression, 1 for lasso-regression')
     parser.add_argument('--maxk', 
                         type=int, 
                         default=40, 

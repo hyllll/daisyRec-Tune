@@ -172,6 +172,14 @@ if __name__ == '__main__':
                 item_num,
                 factors=args.factors
             )
+        elif args.algo_name == 'slim':
+            from daisy.model.SLiMRecommender import SLIM
+            model = SLIM(
+                user_num,
+                item_num,
+                l1_ratio=args.elastic,
+                alpha=args.alpha
+            )
         else:
             raise ValueError('Invalid algorithm name')
     elif args.problem_type == 'pair':
@@ -258,7 +266,7 @@ if __name__ == '__main__':
 
     # build recommender model
     s_time = time.time()
-    if args.algo_name in ['itemknn', 'puresvd']:
+    if args.algo_name in ['itemknn', 'puresvd', 'slim']:
         model.fit(train_set)
     else:
         train_loader = data.DataLoader(
@@ -281,7 +289,7 @@ if __name__ == '__main__':
     print('Generate recommend list...')
     print('')
     preds = {}
-    if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd'] and args.problem_type == 'point':
+    if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point':
         for u in tqdm(test_ucands.keys()):
             pred_rates = [model.predict(u, i) for i in test_ucands[u]]
             rec_idx = np.argsort(pred_rates)[::-1][:args.topk]
