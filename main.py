@@ -378,7 +378,7 @@ if __name__ == '__main__':
         # record all tuning result and settings
         fnl_metric = [f'{mt:.4f}' for mt in fnl_metric]
         if args.algo_name == 'ngcf': 
-            line = ','.join(fnl_metric) + f',{num_ng},{factors},{node_dropout},{mess_dropout},{lr},{reg_2},{batch_size},{reg_2}' + '\n'
+            line = ','.join(fnl_metric) + f',{num_ng},{factors},{node_dropout},{mess_dropout},{lr},{reg_2},{batch_size}' + '\n'
         elif args.algo_name == 'itemknn':
             line = ','.join(fnl_metric) + f',{maxk}' + '\n'
         elif args.algo_name == 'puresvd':
