@@ -203,7 +203,7 @@ class VAE(nn.Module):
         
         # since there is not enough GPU memory to calculate, so we divide the data into batches, and then calculate them.
         row_size = self.rating_mat.shape[0]
-        row_batch_size = 100
+        row_batch_size = 2048 #100
         for i in range(row_size // row_batch_size + 1):
             tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :]
             tmp = torch.tensor(tmp).float()
