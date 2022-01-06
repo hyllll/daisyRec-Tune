@@ -299,7 +299,7 @@ if __name__ == '__main__':
                 train_dataset, 
                 batch_size=batch_size, 
                 shuffle=True, 
-                num_workers=16,
+                num_workers=8,
                 pin_memory=True)
 
                 model.fit(train_loader)
