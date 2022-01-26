@@ -180,6 +180,11 @@ if __name__ == '__main__':
                 l1_ratio=args.elastic,
                 alpha=args.alpha
             )
+        elif args.algo_name == 'mostpop':
+            from daisy.model.PopRecommender import MostPop
+            model = MostPop(
+                n = args.pop_n
+            )
         else:
             raise ValueError('Invalid algorithm name')
     elif args.problem_type == 'pair':
@@ -266,7 +271,7 @@ if __name__ == '__main__':
 
     # build recommender model
     s_time = time.time()
-    if args.algo_name in ['itemknn', 'puresvd', 'slim']:
+    if args.algo_name in ['itemknn', 'puresvd', 'slim', 'mostpop']:
         model.fit(train_set)
     else:
         train_loader = data.DataLoader(
@@ -295,6 +300,8 @@ if __name__ == '__main__':
             rec_idx = np.argsort(pred_rates)[::-1][:args.topk]
             top_n = np.array(test_ucands[u])[rec_idx]
             preds[u] = top_n
+    elif args.algo_name in ['mostpop']:
+        preds = model.predict(test_ur, total_train_ur, args.topk)
     else:
         for u in tqdm(test_ucands.keys()):
             # build a test MF dataset for certain user u to accelerate

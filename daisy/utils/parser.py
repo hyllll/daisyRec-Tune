@@ -133,6 +133,10 @@ def parse_args():
                         type=float, 
                         default=0.5, 
                         help='ratio if lasso result, 0 for ridge-regression, 1 for lasso-regression')
+    parser.add_argument('--pop_n', 
+                        type=int, 
+                        default=100, 
+                        help='Initial selected number of Most-popular')
     parser.add_argument('--maxk', 
                         type=int, 
                         default=40, 
