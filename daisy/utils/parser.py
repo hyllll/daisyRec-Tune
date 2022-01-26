@@ -21,6 +21,10 @@ def parse_args():
                         type=str, 
                         default='mf_small', 
                         help='config json file')
+    parser.add_argument('--device', 
+                        type=str, 
+                        default='gpu', 
+                        help='cpu or gpu')
     parser.add_argument('--problem_type', 
                         type=str, 
                         default='point', 

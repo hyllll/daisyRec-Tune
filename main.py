@@ -170,6 +170,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         beta=kl_reg,
                         loss_type=args.loss_type,
+                        device = args.device,
                         gpuid=args.gpu
                     )
                 elif args.algo_name == 'userknn':
@@ -336,7 +337,7 @@ if __name__ == '__main__':
                     # get top-N list with torch method 
                     for items in tmp_loader:
                         user_u, item_i = items[0], items[1]
-                        if torch.cuda.is_available():
+                        if torch.cuda.is_available() and args.device == 'gpu':
                             user_u = user_u.cuda()
                             item_i = item_i.cuda()
                         else:
