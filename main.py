@@ -25,10 +25,11 @@ if __name__ == '__main__':
     args = parse_args()
 
     # store running time in time_log file
-    result_save_path = './res/'
+    result_save_path = './res/time_log/'
     if not os.path.exists(result_save_path):
         os.makedirs(result_save_path)
-    time_log = open('./res/time_log.txt', 'a') 
+    time_file = f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}_{args.algo_name}_{args.loss_type}'
+    time_log = open(f'./res/time_log/{time_file}.txt', 'a') 
     
     ''' Test Process for Metrics Exporting '''
     # df, user_num, item_num = load_rate(args.dataset, args.prepro, binary=False)
@@ -286,7 +287,7 @@ if __name__ == '__main__':
 
         model.fit(train_loader)
     elapsed_time = time.time() - s_time
-    time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
+    time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}_{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
     time_log.close()
 
     print('Start Calculating Metrics......')
