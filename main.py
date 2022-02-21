@@ -25,6 +25,9 @@ if __name__ == '__main__':
     args = parse_args()
 
     # store running time in time_log file
+    result_save_path = './res/'
+    if not os.path.exists(result_save_path):
+        os.makedirs(result_save_path)
     time_log = open('./res/time_log.txt', 'a') 
     
     ''' Test Process for Metrics Exporting '''
