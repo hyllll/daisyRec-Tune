@@ -25,7 +25,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     # store running time in time_log file
-    time_log = open('time_log.txt', 'a') 
+    time_log = open('./res/time_log.txt', 'a') 
     
     ''' Test Process for Metrics Exporting '''
     # df, user_num, item_num = load_rate(args.dataset, args.prepro, binary=False)
