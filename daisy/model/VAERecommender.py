@@ -21,6 +21,7 @@ class VAE(nn.Module):
                  beta=0.5,
                  loss_type='CL',
                  gpuid='0',
+                 device='gpu',
                  early_stop=True):
         """
         VAE Recommender Class
@@ -46,8 +47,10 @@ class VAE(nn.Module):
         self.beta = beta
         self.loss_type = loss_type
         self.early_stop = early_stop
+        self.device = device
 
-        os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
+        if torch.cuda.is_available() and self.device == 'gpu':
+            os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
         # torch.cuda.set_device(int(gpuid)) # if internal error, try this code instead
 
         cudnn.benchmark = True
@@ -138,7 +141,7 @@ class VAE(nn.Module):
         return z, mu, logvar
 
     def fit(self, train_loader):
-        if torch.cuda.is_available():
+        if torch.cuda.is_available() and self.device=='gpu':
             self.cuda()
         else:
             self.cpu()
@@ -160,7 +163,7 @@ class VAE(nn.Module):
             pbar = tqdm(train_loader)
             pbar.set_description(f'[Epoch {epoch:03d}]')
             for _, ur, mask_ur in pbar:
-                if torch.cuda.is_available():
+                if torch.cuda.is_available() and self.device=='gpu':
                     ur = ur.cuda()
                     mask_ur = mask_ur.cuda()
                 else:
@@ -208,7 +211,7 @@ class VAE(nn.Module):
             tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :]
             tmp = torch.tensor(tmp).float()
 
-            if torch.cuda.is_available():
+            if torch.cuda.is_available() and self.device=='gpu':
                 tmp = tmp.cuda()
             else:
                 tmp = tmp.cpu()

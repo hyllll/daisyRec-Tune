@@ -17,6 +17,10 @@ def parse_args():
                         default='{}', 
                         help='Tuner parameter dictionary, type is JSON string')
     # common settings
+    parser.add_argument('--device', 
+                        type=str, 
+                        default='gpu', 
+                        help='cpu or gpu')
     parser.add_argument('--config_file', 
                         type=str, 
                         default='mf_small', 

@@ -160,7 +160,8 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 beta=args.kl_reg,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                gpuid=args.gpu,
+                device=args.device
             )
         elif args.algo_name == 'itemknn':
             from daisy.model.KNNCFRecommender import ItemKNNCF
@@ -326,7 +327,7 @@ if __name__ == '__main__':
             # get top-N list with torch method 
             for items in tmp_loader:
                 user_u, item_i = items[0], items[1]
-                if torch.cuda.is_available():
+                if torch.cuda.is_available() and args.device=='gpu':
                     user_u = user_u.cuda()
                     item_i = item_i.cuda()
                 else:
