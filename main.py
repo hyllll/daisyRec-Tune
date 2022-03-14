@@ -30,7 +30,10 @@ if __name__ == '__main__':
         os.makedirs(result_save_path)
     time_file = f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}_{args.algo_name}_{args.loss_type}'
     time_log = open(f'./res/time_log/{time_file}.txt', 'a') 
-    
+    if args.early_stop == 1:
+        early_stop = True
+    else:
+        early_stop = False
     ''' Test Process for Metrics Exporting '''
     # df, user_num, item_num = load_rate(args.dataset, args.prepro, binary=False)
     # train_set, test_set = split_test(df, args.test_method, args.test_size)
@@ -115,7 +118,8 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                gpuid=args.gpu,
+                early_stop=early_stop
             )
         elif args.algo_name == 'nfm':
             from daisy.model.point.NFMRecommender import PointNFM
@@ -161,7 +165,8 @@ if __name__ == '__main__':
                 beta=args.kl_reg,
                 loss_type=args.loss_type,
                 gpuid=args.gpu,
-                device=args.device
+                device=args.device,
+                early_stop=early_stop
             )
         elif args.algo_name == 'itemknn':
             from daisy.model.KNNCFRecommender import ItemKNNCF
@@ -204,7 +209,8 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                gpuid=args.gpu,
+                early_stop=early_stop,
             )
         elif args.algo_name == 'fm':
             from daisy.model.pair.FMRecommender import PairFM
@@ -217,7 +223,8 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                gpuid=args.gpu,
+                early_stop=early_stop,
             )
         elif args.algo_name == 'neumf':
             from daisy.model.pair.NeuMFRecommender import PairNeuMF
@@ -249,7 +256,8 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                gpuid=args.gpu,
+                early_stop=early_stop
             )
         elif args.algo_name == 'ngcf':
             from daisy.model.pair.NGCFRecommender import NGCF
@@ -267,7 +275,8 @@ if __name__ == '__main__':
                         epochs=args.epochs,
                         node_dropout_flag=args.node_dropout_flag,
                         loss_type=args.loss_type,
-                        gpuid=args.gpu
+                        gpuid=args.gpu,
+                        early_stop=early_stop
                     )
         else:
             raise ValueError('Invalid algorithm name')
@@ -374,7 +383,42 @@ if __name__ == '__main__':
 
         res[k] = np.array([pre_k, rec_k, hr_k, map_k, mrr_k, ndcg_k])
 
-    common_prefix = f'with_{args.sample_ratio}{args.sample_method}'
+    # common_prefix = f'with_{args.sample_ratio}{args.sample_method}'
+    if args.reg_2 != 0:
+        reg = 1
+    else:
+        reg = 0
+
+    if args.dropout != 0:
+        dropout = 1
+    else:
+        dropout = 0   
+
+    if args.mess_dropout != 0:
+        mess_dropout = 1
+    else:
+        mess_dropout = 0
+
+    if args.node_dropout != 0:
+        node_dropout = 1
+    else:
+        node_dropout = 0
+
+    if args.kl_reg != 0:
+        kl_reg  = 1
+    else:
+        kl_reg  = 0
+
+    if args.algo == 'mf' or args.algo == 'fm':
+        common_prefix = f'with_{reg}_{args.early_stop}'
+    elif args.algo == 'neumf' or args.algo == 'nfm':
+        common_prefix = f'with_{reg}_{dropout}_{args.early_stop}'
+    elif args.algo == 'ngcf':
+        common_prefix = f'with_{reg}_{node_dropout}_{mess_dropout}_{args.early_stop}'
+    elif args.algo == 'vae':
+        common_prefix = f'with_{reg}_{kl_reg}_{dropout}_{args.early_stop}'
+    
+
     algo_prefix = f'{args.loss_type}_{args.problem_type}_{args.algo_name}'
 
     res.to_csv(

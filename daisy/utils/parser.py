@@ -41,6 +41,10 @@ def parse_args():
                         type=str, 
                         default='10core', 
                         help='dataset preprocess op.: origin/Ncore')
+    parser.add_argument('--early_stop', 
+                        type=int, 
+                        default=1, 
+                        help='whether to activate early stop mechanism')
     parser.add_argument('--topk', 
                         type=int, 
                         default=50, 
