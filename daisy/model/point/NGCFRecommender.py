@@ -108,27 +108,27 @@ class NGCF(nn.Module):
             out=out.cpu()
         return out * (1. / (1 - rate))
     
-    def create_bpr_loss(self, users, pos_items, neg_items):
-        pos_scores = torch.sum(torch.mul(users, pos_items), dim=1)
-        neg_scores = torch.sum(torch.mul(users, neg_items), dim=1)
+    # def create_bpr_loss(self, users, pos_items, neg_items):
+    #     pos_scores = torch.sum(torch.mul(users, pos_items), dim=1)
+    #     neg_scores = torch.sum(torch.mul(users, neg_items), dim=1)
         
-        maxi = nn.LogSigmoid()(pos_scores - neg_scores)
+    #     maxi = nn.LogSigmoid()(pos_scores - neg_scores)
 
-        mf_loss = -1 * torch.mean(maxi)
+    #     mf_loss = -1 * torch.mean(maxi)
 
-        # cul regularizer
-        regularizer = (torch.norm(users) ** 2
-                       + torch.norm(pos_items) ** 2
-                       + torch.norm(neg_items) ** 2) / 2
-        emb_loss = self.reg_2 * regularizer / self.batch_size
+    #     # cul regularizer
+    #     regularizer = (torch.norm(users) ** 2
+    #                    + torch.norm(pos_items) ** 2
+    #                    + torch.norm(neg_items) ** 2) / 2
+    #     emb_loss = self.reg_2 * regularizer / self.batch_size
 
-        return mf_loss + emb_loss, mf_loss, emb_loss
+    #     return mf_loss + emb_loss, mf_loss, emb_loss
 
 
     def rating(self, u_g_embeddings, pos_i_g_embeddings):
         return torch.matmul(u_g_embeddings, pos_i_g_embeddings.t())
     
-    def forward(self, user, item_i, item_j):
+    def forward(self, user, item_i):
         drop_flag=self.node_dropout_flag
         A_hat = self.sparse_dropout(self.sparse_norm_adj,
                                     self.node_dropout,
@@ -174,15 +174,23 @@ class NGCF(nn.Module):
         """
         u_g_embeddings = u_g_embeddings[user, :]
         pos_i_g_embeddings = i_g_embeddings[item_i, :]
-        neg_i_g_embeddings = i_g_embeddings[item_j, :]
 
-        return u_g_embeddings, pos_i_g_embeddings, neg_i_g_embeddings
+        pos_scores = torch.sum(torch.mul(u_g_embeddings, pos_i_g_embeddings), dim=1)
+        reg = (torch.norm(u_g_embeddings) ** 2 + torch.norm(pos_i_g_embeddings) ** 2) / 2
+
+        return pos_scores, reg
     
     def fit(self, train_loader):
         if torch.cuda.is_available():
             self.cuda()
         else:
             self.cpu()
+        if self.loss_type == 'CL':
+            criterion = nn.BCEWithLogitsLoss(reduction='sum')
+        elif self.loss_type == 'SL':
+            criterion = nn.MSELoss(reduction='sum')
+        else:
+            raise ValueError(f'Invalid loss type: {self.loss_type}')
 
         #optimizer = optim.SGD(self.parameters(), lr=self.lr, weight_decay=self.wd)
         optimizer = optim.Adam(self.parameters(), lr=self.lr)
@@ -195,33 +203,21 @@ class NGCF(nn.Module):
             # set process bar display
             pbar = tqdm(train_loader)
             pbar.set_description(f'[Epoch {epoch:03d}]')
-            for user, item_i, item_j, label in pbar:
+            for user, item, label in pbar:
                 if torch.cuda.is_available():
                     user = user.cuda()
-                    item_i = item_i.cuda()
-                    item_j = item_j.cuda()
+                    item = item.cuda()
                     label = label.cuda()
                 else:
                     user = user.cpu()
-                    item_i = item_i.cpu()
-                    item_j = item_j.cpu()
+                    item = item.cpu()
                     label = label.cpu()
 
                 self.zero_grad()
-                emd_u, emd_i, emd_j = self.forward(user, item_i, item_j)
-                pred_i = torch.sum(torch.mul(emd_u, emd_i), dim=1)
-                pred_j = torch.sum(torch.mul(emd_u, emd_j), dim=1)
-                if self.loss_type == 'BPR':
-                    loss = -((pred_i - pred_j).sigmoid() + 1e-24).log().sum()
-                elif self.loss_type == 'HL':
-                    loss = torch.clamp(1 - (pred_i - pred_j) * label, min=0).sum()
-                elif self.loss_type == 'TL':
-                    loss = (pred_j - pred_i).sigmoid().mean() + pred_j.pow(2).sigmoid().mean()
-                else:
-                    raise ValueError(f'Invalid loss type: {self.loss_type}')
+                prediction, reg = self.forward(user, item)
+                loss = criterion(prediction, label)
                 
-                regularizer = (torch.norm(emd_u) ** 2 + torch.norm(emd_i) ** 2 + torch.norm(emd_j) ** 2) / 2
-                loss += self.reg_2 * regularizer / self.batch_size
+                loss += self.reg_2 * reg / self.batch_size
 
                 if torch.isnan(loss):
                     raise ValueError(f'Loss=Nan or Infinity: current settings does not fit the recommender')
@@ -241,6 +237,6 @@ class NGCF(nn.Module):
                 last_loss = current_loss
 
     def predict(self, u, i):
-        emd_u, emd_i, _ = self.forward(u, i, i)
-        pred_i = torch.sum(torch.mul(emd_u, emd_i), dim=1)
+        pred_i, _ = self.forward(u, i)
+        
         return pred_i.cpu()
