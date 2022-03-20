@@ -409,13 +409,13 @@ if __name__ == '__main__':
     else:
         kl_reg  = 0
 
-    if args.algo == 'mf' or args.algo == 'fm':
+    if args.algo_name == 'mf' or args.algo_name == 'fm':
         common_prefix = f'with_{reg}_{args.early_stop}'
-    elif args.algo == 'neumf' or args.algo == 'nfm':
+    elif args.algo_name == 'neumf' or args.algo_name == 'nfm':
         common_prefix = f'with_{reg}_{dropout}_{args.early_stop}'
-    elif args.algo == 'ngcf':
+    elif args.algo_name == 'ngcf':
         common_prefix = f'with_{reg}_{node_dropout}_{mess_dropout}_{args.early_stop}'
-    elif args.algo == 'vae':
+    elif args.algo_name == 'vae':
         common_prefix = f'with_{reg}_{kl_reg}_{dropout}_{args.early_stop}'
     
 
