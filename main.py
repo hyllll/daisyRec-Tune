@@ -138,6 +138,25 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu
             )
+        elif args.algo_name == 'NGCF':
+            from daisy.model.point.NGCFRecommender import PointNGCF
+            plain_adj, norm_adj, mean_adj = get_adj_mat(user_num,item_num)
+            model = PointNGCF(
+                        user_num,
+                        item_num,
+                        norm_adj=norm_adj,
+                        factors=args.factors,
+                        batch_size=args.batch_size,
+                        node_dropout=args.node_dropout,
+                        mess_dropout=args.mess_dropout,
+                        lr=args.lr,
+                        reg_2=args.reg_2,
+                        epochs=args.epochs,
+                        node_dropout_flag=args.node_dropout_flag,
+                        loss_type=args.loss_type,
+                        gpuid=args.gpu,
+                        early_stop=early_stop
+                    )
         elif args.algo_name == 'cdae':
             from daisy.model.CDAERecommender import CDAE
             model = CDAE(
@@ -260,9 +279,9 @@ if __name__ == '__main__':
                 early_stop=early_stop
             )
         elif args.algo_name == 'ngcf':
-            from daisy.model.pair.NGCFRecommender import NGCF
+            from daisy.model.pair.NGCFRecommender import PairNGCF
             plain_adj, norm_adj, mean_adj = get_adj_mat(user_num,item_num)
-            model = NGCF(
+            model = PairNGCF(
                         user_num,
                         item_num,
                         norm_adj=norm_adj,

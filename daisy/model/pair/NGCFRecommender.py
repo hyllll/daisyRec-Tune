@@ -15,7 +15,7 @@ import torch.backends.cudnn as cudnn
 from tqdm import tqdm
 
 
-class NGCF(nn.Module):
+class PairNGCF(nn.Module):
     def __init__(self, 
                 n_user, 
                 n_item, 
