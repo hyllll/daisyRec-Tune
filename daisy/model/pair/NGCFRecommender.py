@@ -31,7 +31,7 @@ class PairNGCF(nn.Module):
                 loss_type='BPR',
                 early_stop=True,
                 gpuid='0'):
-        super(NGCF, self).__init__()
+        super(PairNGCF, self).__init__()
         os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
         cudnn.benchmark = True
         
