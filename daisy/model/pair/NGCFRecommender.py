@@ -30,7 +30,8 @@ class PairNGCF(nn.Module):
                 node_dropout_flag,
                 loss_type='BPR',
                 early_stop=True,
-                gpuid='0'):
+                gpuid='0',
+                optimizer='adam'):
         super(PairNGCF, self).__init__()
         os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
         cudnn.benchmark = True
@@ -50,7 +51,8 @@ class PairNGCF(nn.Module):
         self.node_dropout_flag=node_dropout_flag
 
         self.loss_type = loss_type
-        self.early_stop=early_stop
+        self.early_stop = early_stop
+        self.optimizer = optimizer
 
         self.embedding_dict, self.weight_dict = self.init_weight()
         self.sparse_norm_adj = self._convert_sp_mat_to_sp_tensor(self.norm_adj)
@@ -185,7 +187,11 @@ class PairNGCF(nn.Module):
             self.cpu()
 
         #optimizer = optim.SGD(self.parameters(), lr=self.lr, weight_decay=self.wd)
-        optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        if self.optimizer == 'adam':
+            optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        elif self.optimizer == 'sgd':
+            optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

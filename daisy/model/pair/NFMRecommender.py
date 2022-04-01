@@ -22,7 +22,8 @@ class PairNFM(nn.Module):
                  reg_2=0.,
                  loss_type='BPR', 
                  gpuid='0', 
-                 early_stop=True):
+                 early_stop=True,
+                 optimizer='adagrad'):
         """
         Pair-wise NFM Recommender Class
         Parameters
@@ -59,6 +60,7 @@ class PairNFM(nn.Module):
         self.epochs = epochs
         self.loss_type = loss_type
         self.early_stop = early_stop
+        self.optimizer = optimizer
 
         self.embed_user = nn.Embedding(user_num, factors)
         self.embed_item = nn.Embedding(item_num, factors)
@@ -140,7 +142,12 @@ class PairNFM(nn.Module):
         else:
             self.cpu()
 
-        optimizer = optim.Adagrad(self.parameters(), lr=self.lr, initial_accumulator_value=1e-8)
+        if self.optimizer == 'adagrad':
+            optimizer = optim.Adagrad(self.parameters(), lr=self.lr, initial_accumulator_value=1e-8)
+        elif self.optimizer == 'sgd':
+            optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        elif self.optimizer == 'adam':
+            optimizer = optim.Adam(self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

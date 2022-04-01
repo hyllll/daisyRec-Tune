@@ -84,6 +84,10 @@ def parse_args():
                         type=str, 
                         default='', 
                         help='weight initialization method')
+    parser.add_argument('--optimizer', 
+                        type=str, 
+                        default='sgd', 
+                        help='optimize method')
     parser.add_argument('--gpu', 
                         type=str, 
                         default='0', 

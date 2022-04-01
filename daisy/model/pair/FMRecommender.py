@@ -18,7 +18,8 @@ class PairFM(nn.Module):
                  reg_2=0.,
                  loss_type='BPR',
                  gpuid='0', 
-                 early_stop=True):
+                 early_stop=True,
+                 optimizer='sgd'):
         """
         Pair-wise FM Recommender Class
         Parameters
@@ -60,6 +61,7 @@ class PairFM(nn.Module):
 
         self.loss_type = loss_type
         self.early_stop = early_stop
+        self.optimizer = optimizer
 
     def forward(self, u, i, j):
         user = self.embed_user(u)
@@ -82,7 +84,10 @@ class PairFM(nn.Module):
         else:
             self.cpu()
 
-        optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        if self.optimizer == 'sgd':
+            optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        elif self.optimizer == 'adam':
+            optimizer = optim.Adam(self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

@@ -23,7 +23,8 @@ class PointNeuMF(nn.Module):
                  GMF_model=None, 
                  MLP_model=None, 
                  gpuid='0', 
-                 early_stop=True):
+                 early_stop=True,
+                 optimizer='adam'):
         """
         Point-wise NeuMF Recommender Class
         Parameters
@@ -83,6 +84,7 @@ class PointNeuMF(nn.Module):
 
         self.loss_type = loss_type
         self.early_stop = early_stop
+        self.optimizer = optimizer
 
     def _init_weight_(self):
         '''weights initialization'''
@@ -159,7 +161,11 @@ class PointNeuMF(nn.Module):
         if self.model == 'NeuMF-pre':
             optimizer = optim.SGD(self.parameters(), lr=self.lr)
         else:
-            optimizer = optim.Adam(self.parameters(), lr=self.lr)
+            if self.optimizer == 'adam':
+                optimizer = optim.Adam(self.parameters(), lr=self.lr)
+            elif self.optimizer == 'sgd':
+                optimizer = optim.SGD(self.parameters(), lr=self.lr)
+            
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

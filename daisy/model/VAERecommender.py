@@ -22,7 +22,8 @@ class VAE(nn.Module):
                  loss_type='CL',
                  gpuid='0',
                  device='gpu',
-                 early_stop=True):
+                 early_stop=True,
+                 optimizer='adam'):
         """
         VAE Recommender Class
         Parameters
@@ -48,6 +49,7 @@ class VAE(nn.Module):
         self.loss_type = loss_type
         self.early_stop = early_stop
         self.device = device
+        self.optimizer = optimizer
 
         if torch.cuda.is_available() and self.device == 'gpu':
             os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
@@ -153,7 +155,10 @@ class VAE(nn.Module):
         else:
             raise ValueError('Invalid loss type')
 
-        optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        if self.optimizer == 'adam':
+            optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        elif self.optimizer == 'sgd':
+            optimizer = optim.SGD(self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):
