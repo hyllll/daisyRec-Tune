@@ -23,7 +23,8 @@ class PairNFM(nn.Module):
                  loss_type='BPR', 
                  gpuid='0', 
                  early_stop=True,
-                 optimizer='adagrad'):
+                 optimizer='adagrad',
+                 initializer='normal'):
         """
         Pair-wise NFM Recommender Class
         Parameters
@@ -61,6 +62,7 @@ class PairNFM(nn.Module):
         self.loss_type = loss_type
         self.early_stop = early_stop
         self.optimizer = optimizer
+        self.initializer=initializer
 
         self.embed_user = nn.Embedding(user_num, factors)
         self.embed_item = nn.Embedding(item_num, factors)
@@ -99,19 +101,52 @@ class PairNFM(nn.Module):
         self._init_weight()
 
     def _init_weight(self):
-        nn.init.normal_(self.embed_item.weight, std=0.01)
-        nn.init.normal_(self.embed_user.weight, std=0.01)
-        nn.init.constant_(self.u_bias.weight, 0.0)
-        nn.init.constant_(self.i_bias.weight, 0.0)
+        if self.initializer == 'xavier_uniform':
+            initializer = nn.init.xavier_uniform_
+        elif self.initializer == 'xavier_normal':
+            initializer = nn.init.xavier_normal_
+        
+        if self.initializer == 'normal':
+            nn.init.normal_(self.embed_item.weight, std=0.01)
+            nn.init.normal_(self.embed_user.weight, std=0.01)
+            nn.init.constant_(self.u_bias.weight, 0.0)
+            nn.init.constant_(self.i_bias.weight, 0.0)
 
-        # for deep layers
-        if self.num_layers > 0:
-            for m in self.deep_layers:
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_normal_(m.weight)
-            nn.init.xavier_normal_(self.prediction.weight)
+            # for deep layers
+            if self.num_layers > 0:
+                for m in self.deep_layers:
+                    if isinstance(m, nn.Linear):
+                        nn.init.xavier_normal_(m.weight)
+                nn.init.xavier_normal_(self.prediction.weight)
+            else:
+                nn.init.constant_(self.prediction.weight, 1.0)
         else:
-            nn.init.constant_(self.prediction.weight, 1.0)
+            initializer(self.embed_item.weight)
+            initializer(self.embed_user.weight)
+            nn.init.constant_(self.u_bias.weight, 0.0)
+            nn.init.constant_(self.i_bias.weight, 0.0)
+
+            # for deep layers
+            if self.num_layers > 0:
+                for m in self.deep_layers:
+                    if isinstance(m, nn.Linear):
+                        initializer(m.weight)
+                initializer(self.prediction.weight)
+            else:
+                nn.init.constant_(self.prediction.weight, 1.0)
+        # nn.init.normal_(self.embed_item.weight, std=0.01)
+        # nn.init.normal_(self.embed_user.weight, std=0.01)
+        # nn.init.constant_(self.u_bias.weight, 0.0)
+        # nn.init.constant_(self.i_bias.weight, 0.0)
+
+        # # for deep layers
+        # if self.num_layers > 0:
+        #     for m in self.deep_layers:
+        #         if isinstance(m, nn.Linear):
+        #             nn.init.xavier_normal_(m.weight)
+        #     nn.init.xavier_normal_(self.prediction.weight)
+        # else:
+        #     nn.init.constant_(self.prediction.weight, 1.0)
 
     def forward(self, u, i, j):
         user = self.embed_user(u)

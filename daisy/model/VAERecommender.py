@@ -23,7 +23,8 @@ class VAE(nn.Module):
                  gpuid='0',
                  device='gpu',
                  early_stop=True,
-                 optimizer='adam'):
+                 optimizer='adam',
+                 initializer='xavier_normal'):
         """
         VAE Recommender Class
         Parameters
@@ -50,6 +51,7 @@ class VAE(nn.Module):
         self.early_stop = early_stop
         self.device = device
         self.optimizer = optimizer
+        self.initializer = initializer
 
         if torch.cuda.is_available() and self.device == 'gpu':
             os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
@@ -85,24 +87,30 @@ class VAE(nn.Module):
         self.prediction = None
 
     def _init_weights(self):
+
         for layer in self.q_layers:
             # Xavier Initialization for weights
-            size = layer.weight.size()
-            fan_out = size[0]
-            fan_in = size[1]
-            std = np.sqrt(2.0/(fan_in + fan_out))
-            layer.weight.data.normal_(0.0, std)
-
+            if self.initializer == 'xavier_normal':
+                size = layer.weight.size()
+                fan_out = size[0]
+                fan_in = size[1]
+                std = np.sqrt(2.0/(fan_in + fan_out))
+                layer.weight.data.normal_(0.0, std)
+            elif self.initializer == 'xavier_uniform':
+                nn.init.xavier_uniform_(layer.weight)
             # Normal Initialization for Biases
             layer.bias.data.normal_(0.0, 0.001)
         
         for layer in self.p_layers:
             # Xavier Initialization for weights
-            size = layer.weight.size()
-            fan_out = size[0]
-            fan_in = size[1]
-            std = np.sqrt(2.0/(fan_in + fan_out))
-            layer.weight.data.normal_(0.0, std)
+            if self.initializer == 'xavier_normal':
+                size = layer.weight.size()
+                fan_out = size[0]
+                fan_in = size[1]
+                std = np.sqrt(2.0/(fan_in + fan_out))
+                layer.weight.data.normal_(0.0, std)
+            elif self.initializer == 'xavier_uniform':
+                nn.init.xavier_uniform_(layer.weight)
 
             # Normal Initialization for Biases
             layer.bias.data.normal_(0.0, 0.001)

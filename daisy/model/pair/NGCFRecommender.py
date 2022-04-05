@@ -31,7 +31,8 @@ class PairNGCF(nn.Module):
                 loss_type='BPR',
                 early_stop=True,
                 gpuid='0',
-                optimizer='adam'):
+                optimizer='adam',
+                initializer='xavier_uniform'):
         super(PairNGCF, self).__init__()
         os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
         cudnn.benchmark = True
@@ -53,6 +54,7 @@ class PairNGCF(nn.Module):
         self.loss_type = loss_type
         self.early_stop = early_stop
         self.optimizer = optimizer
+        self.initializer = initializer
 
         self.embedding_dict, self.weight_dict = self.init_weight()
         self.sparse_norm_adj = self._convert_sp_mat_to_sp_tensor(self.norm_adj)
@@ -62,7 +64,10 @@ class PairNGCF(nn.Module):
             self.sparse_norm_adj=self.sparse_norm_adj.cpu()
     
     def init_weight(self):
-        initializer = nn.init.xavier_uniform_
+        if self.initializer == 'xavier_uniform':
+            initializer = nn.init.xavier_uniform_
+        elif self.initializer == 'xavier_normal':
+            initializer = nn.init.xavier_normal_
 
         embedding_dict = nn.ParameterDict({
             'user_emb': nn.Parameter(initializer(torch.empty(self.n_user,

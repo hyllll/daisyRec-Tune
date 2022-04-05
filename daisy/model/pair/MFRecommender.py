@@ -19,7 +19,8 @@ class PairMF(nn.Module):
                  loss_type='BPR', 
                  gpuid='0', 
                  early_stop=True,
-                 optimizer='sgd'):
+                 optimizer='sgd',
+                 initializer='normal'):
         """
         Point-wise MF Recommender Class
         Parameters
@@ -48,8 +49,12 @@ class PairMF(nn.Module):
         self.embed_user = nn.Embedding(user_num, factors)
         self.embed_item = nn.Embedding(item_num, factors)
 
-        nn.init.normal_(self.embed_user.weight, std=0.01)
-        nn.init.normal_(self.embed_item.weight, std=0.01)
+        if initializer == 'normal':
+            nn.init.normal_(self.embed_user.weight, std=0.01)
+            nn.init.normal_(self.embed_item.weight, std=0.01)
+        elif initializer == 'uniform':
+            nn.init.uniform_(self.embed_user.weight)
+            nn.init.uniform_(self.embed_item.weight)
 
         self.loss_type = loss_type
         self.early_stop = early_stop

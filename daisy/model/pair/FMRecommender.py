@@ -19,7 +19,8 @@ class PairFM(nn.Module):
                  loss_type='BPR',
                  gpuid='0', 
                  early_stop=True,
-                 optimizer='sgd'):
+                 optimizer='sgd',
+                 initializer='normal'):
         """
         Pair-wise FM Recommender Class
         Parameters
@@ -54,8 +55,13 @@ class PairFM(nn.Module):
         self.bias_ = nn.Parameter(torch.tensor([0.0]))
 
         # init weight
-        nn.init.normal_(self.embed_user.weight, std=0.01)
-        nn.init.normal_(self.embed_item.weight, std=0.01)
+        if initializer == 'normal':
+            nn.init.normal_(self.embed_user.weight, std=0.01)
+            nn.init.normal_(self.embed_item.weight, std=0.01)
+        elif initializer == 'uniform':
+            nn.init.uniform_(self.embed_user.weight)
+            nn.init.uniform_(self.embed_item.weight)
+        
         nn.init.constant_(self.u_bias.weight, 0.0)
         nn.init.constant_(self.i_bias.weight, 0.0)
 

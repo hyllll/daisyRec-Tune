@@ -88,6 +88,10 @@ def parse_args():
                         type=str, 
                         default='sgd', 
                         help='optimize method')
+    parser.add_argument('--initializer', 
+                        type=str, 
+                        default='normal', 
+                        help='parameter initialization method: normal, uniform, xavier_normal, xavier_uniform')
     parser.add_argument('--gpu', 
                         type=str, 
                         default='0', 

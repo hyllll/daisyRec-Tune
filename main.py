@@ -121,6 +121,7 @@ if __name__ == '__main__':
                 gpuid=args.gpu,
                 early_stop=early_stop,
                 optimizer=args.optimizer,
+                initializer=args.initializer
             )
         elif args.algo_name == 'nfm':
             from daisy.model.point.NFMRecommender import PointNFM
@@ -187,7 +188,8 @@ if __name__ == '__main__':
                 gpuid=args.gpu,
                 device=args.device,
                 early_stop=early_stop,
-                optimizer=args.optimizer
+                optimizer=args.optimizer,
+                initializer=args.initializer
             )
         elif args.algo_name == 'itemknn':
             from daisy.model.KNNCFRecommender import ItemKNNCF
@@ -232,7 +234,8 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu,
                 early_stop=early_stop,
-                optimizer=args.optimizer
+                optimizer=args.optimizer,
+                initializer=args.initializer
             )
         elif args.algo_name == 'fm':
             from daisy.model.pair.FMRecommender import PairFM
@@ -247,7 +250,8 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu,
                 early_stop=early_stop,
-                optimizer=args.optimizer
+                optimizer=args.optimizer,
+                initializer=args.initializer
             )
         elif args.algo_name == 'neumf':
             from daisy.model.pair.NeuMFRecommender import PairNeuMF
@@ -281,7 +285,8 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu,
                 early_stop=early_stop,
-                optimizer=args.optimizer
+                optimizer=args.optimizer,
+                initializer=args.initializer
             )
         elif args.algo_name == 'ngcf':
             from daisy.model.pair.NGCFRecommender import PairNGCF
@@ -301,7 +306,8 @@ if __name__ == '__main__':
                         loss_type=args.loss_type,
                         gpuid=args.gpu,
                         early_stop=early_stop,
-                        optimizer=args.optimizer
+                        optimizer=args.optimizer,
+                        initializer=args.initializer
                     )
         else:
             raise ValueError('Invalid algorithm name')
@@ -447,6 +453,6 @@ if __name__ == '__main__':
     algo_prefix = f'{args.loss_type}_{args.problem_type}_{args.algo_name}'
 
     res.to_csv(
-        f'{result_save_path}{algo_prefix}_{common_prefix}_{args.optimizer}_results.csv', 
+        f'{result_save_path}{algo_prefix}_{common_prefix}_{args.optimizer}_{args.initializer}_results.csv', 
         index=False
     )
