@@ -448,6 +448,8 @@ if __name__ == '__main__':
         common_prefix = f'with_{reg}_{node_dropout}_{mess_dropout}_{args.early_stop}'
     elif args.algo_name == 'vae':
         common_prefix = f'with_{reg}_{kl_reg}_{dropout}_{args.early_stop}'
+    else:
+        common_prefix = f'with'
     
 
     algo_prefix = f'{args.loss_type}_{args.problem_type}_{args.algo_name}'
