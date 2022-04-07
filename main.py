@@ -140,7 +140,7 @@ if __name__ == '__main__':
                 loss_type=args.loss_type,
                 gpuid=args.gpu
             )
-        elif args.algo_name == 'NGCF':
+        elif args.algo_name == 'ngcf':
             from daisy.model.point.NGCFRecommender import PointNGCF
             plain_adj, norm_adj, mean_adj = get_adj_mat(user_num,item_num)
             model = PointNGCF(
