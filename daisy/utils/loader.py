@@ -319,7 +319,8 @@ def convert_npy_mat(user_num, item_num, df):
     -------
     mat : np.matrix, rating matrix
     """
-    mat = np.zeros((user_num, item_num))
+    # mat = np.zeros((user_num, item_num))
+    mat = sp.dok_matrix((user_num, item_num), dtype=np.float32)
     for _, row in df.iterrows():
         u, i, r = row['user'], row['item'], row['rating']
         mat[int(u), int(i)] = float(r)
