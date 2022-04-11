@@ -92,6 +92,10 @@ def parse_args():
                         type=str, 
                         default='CL', 
                         help='loss function type')
+    parser.add_argument('--tune_testset', 
+                        type=int, 
+                        default=0, 
+                        help='whether directly tune on dataset')
     # algo settings
     parser.add_argument('--factors', 
                         type=int, 

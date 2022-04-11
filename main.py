@@ -414,7 +414,14 @@ if __name__ == '__main__':
     item_pool = set(range(item_num))
     candidates_num = args.cand_num
 
-    train_set_list, val_set_list, fn = split_validation(
+    if args.tune_testset == 1:
+        train_set_list = []
+        val_set_list = []
+        fn = 1
+        train_set_list.append(train_set)
+        val_set_list.append(test_set)
+    else:
+        train_set_list, val_set_list, fn = split_validation(
         train_set, 
         args.val_method, 
         args.fold_num
