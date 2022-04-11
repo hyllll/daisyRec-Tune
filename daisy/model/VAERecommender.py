@@ -208,7 +208,7 @@ class VAE(nn.Module):
         row_size = self.rating_mat.shape[0]
         row_batch_size = 2048 #100
         for i in range(row_size // row_batch_size + 1):
-            tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :]
+            tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :].A.squeeze()
             tmp = torch.tensor(tmp).float()
 
             if torch.cuda.is_available() and self.device=='gpu':
