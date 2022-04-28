@@ -25,11 +25,11 @@ if __name__ == '__main__':
     args = parse_args()
 
     # store running time in time_log file
-    result_save_path = './res/time_log/'
+    result_save_path = './res/time_log_jupyter/'
     if not os.path.exists(result_save_path):
         os.makedirs(result_save_path)
     time_file = f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}_{args.algo_name}_{args.loss_type}'
-    time_log = open(f'./res/time_log/{time_file}.txt', 'a') 
+    time_log = open(f'./res/time_log_jupyter/{time_file}.txt', 'a') 
     if args.early_stop == 1:
         early_stop = True
     else:
