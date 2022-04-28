@@ -458,6 +458,6 @@ if __name__ == '__main__':
     algo_prefix = f'{args.loss_type}_{args.problem_type}_{args.algo_name}'
 
     res.to_csv(
-        f'{result_save_path}{algo_prefix}_{common_prefix}_{args.optimizer}_{args.initializer}_results.csv', 
+        f'{result_save_path}{algo_prefix}_{common_prefix}_{args.optimizer}_{args.initializer}_{args.sample_method}_{args.sample_ratio}results.csv', 
         index=False
     )
