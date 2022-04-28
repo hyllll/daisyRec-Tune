@@ -45,6 +45,10 @@ def parse_args():
                         type=int, 
                         default=1, 
                         help='whether to activate early stop mechanism')
+    parser.add_argument('--test_time', 
+                        type=int, 
+                        default=0, 
+                        help='whether to test time complexity')
     parser.add_argument('--topk', 
                         type=int, 
                         default=50, 

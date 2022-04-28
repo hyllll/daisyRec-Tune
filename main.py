@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from collections import defaultdict
+import sys
 
 import torch
 import torch.utils.data as data
@@ -331,6 +332,8 @@ if __name__ == '__main__':
     time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}_{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
     time_log.close()
     print('training complete')
+    if args.test_time == 1:
+        sys.exit(0)
 
     print('Start Calculating Metrics......')
     test_ucands = build_candidates_set(test_ur, total_train_ur, item_pool, candidates_num)
