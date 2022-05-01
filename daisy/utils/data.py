@@ -151,10 +151,10 @@ class UAEData(data.Dataset):
         self.user_num = user_num
         self.item_num = item_num
 
-        self.R = sp.dok_matrix((user_num, item_num), dtype=np.float32)  # true label
-        self.mask_R = sp.dok_matrix((user_num, item_num), dtype=np.float32) # only concern interaction known
-        # self.R = np.zeros((user_num, item_num), dtype=np.float32)
-        # self.mask_R = np.zeros((user_num, item_num), dtype=np.float32)
+        # self.R = sp.dok_matrix((user_num, item_num), dtype=np.float32)  # true label
+        # self.mask_R = sp.dok_matrix((user_num, item_num), dtype=np.float32) # only concern interaction known
+        self.R = np.zeros((user_num, item_num), dtype=np.float32)
+        self.mask_R = np.zeros((user_num, item_num), dtype=np.float32)
         self.user_idx = np.array(range(user_num))
 
         for _, row in train_set.iterrows():
@@ -171,10 +171,10 @@ class UAEData(data.Dataset):
 
     def __getitem__(self, idx):
         u = self.user_idx[idx]
-        # ur = self.R[idx]
-        # mask_ur = self.mask_R[idx]
-        ur = self.R[idx].A.squeeze()
-        mask_ur = self.mask_R[idx].A.squeeze()
+        ur = self.R[idx]
+        mask_ur = self.mask_R[idx]
+        # ur = self.R[idx].A.squeeze()
+        # mask_ur = self.mask_R[idx].A.squeeze()
 
         return u, ur, mask_ur
 
