@@ -116,6 +116,8 @@ class VAE(nn.Module):
         self._init_weights()
 
         self.prediction = None
+        self.user2pred_id = {}
+        self.count = 0
 
     def _init_weights(self):
 
@@ -211,7 +213,7 @@ class VAE(nn.Module):
             current_loss = 0.
             pbar = tqdm(batch_generator)
             pbar.set_description(f'[Epoch {epoch:03d}]')
-            for _, batch_matrix in pbar:
+            for batch_matrix in pbar:
                 self.zero_grad()
                 pred, mu, logvar = self.forward(batch_matrix)
                 loss = criterion(pred * batch_matrix, batch_matrix)
@@ -245,27 +247,41 @@ class VAE(nn.Module):
 
         
         # since there is not enough GPU memory to calculate, so we divide the data into batches, and then calculate them.
-        print("calculate result")
-        row_size = self.rating_mat.shape[0]
-        row_batch_size = 2048 #100
-        for i in range(row_size // row_batch_size + 1):
-            tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :].A.squeeze()
-            tmp = torch.tensor(tmp).float()
+        # print("calculate result")
+        # row_size = self.rating_mat.shape[0]
+        # row_batch_size = 2048 #100
+        # for i in range(row_size // row_batch_size + 1):
+        #     tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :].A.squeeze()
+        #     tmp = torch.tensor(tmp).float()
 
-            if torch.cuda.is_available() and self.device=='gpu':
-                tmp = tmp.cuda()
-            else:
-                tmp = tmp.cpu()
-            tmp_pred = self.forward(tmp)[0]
-            tmp_pred.clamp_(min=0, max=5)
-            tmp_pred = tmp_pred.cpu().detach().numpy()
+        #     if torch.cuda.is_available() and self.device=='gpu':
+        #         tmp = tmp.cuda()
+        #     else:
+        #         tmp = tmp.cpu()
+        #     tmp_pred = self.forward(tmp)[0]
+        #     tmp_pred.clamp_(min=0, max=5)
+        #     tmp_pred = tmp_pred.cpu().detach().numpy()
 
-            if i == 0:
-                self.prediction = tmp_pred
-            else:
-                self.prediction = np.vstack((self.prediction, tmp_pred))
-        print("vae result complete")
+        #     if i == 0:
+        #         self.prediction = tmp_pred
+        #     else:
+        #         self.prediction = np.vstack((self.prediction, tmp_pred))
+        # print("vae result complete")
 
 
     def predict(self, u, i):
-        return self.prediction[u, i]
+        if u in self.user2pred_id:
+            return self.prediction[self.user2pred_id[u], i]
+        else:
+            self.user2pred_id[u] = self.count
+            tmp = self.rating_mat[u, :].A.squeeze()
+            tmp = torch.tensor(tmp).view(1, -1).float().cuda()
+            tmp_pred = self.forward(tmp)[0]
+            tmp_pred.clamp_(min=0, max=5)
+            tmp_pred = tmp_pred.cpu().detach().numpy()
+            if self.count == 0:
+                self.prediction = tmp_pred
+            else:
+                self.prediction = np.vstack((self.prediction, tmp_pred))
+                self.count += 1
+            return self.prediction[self.user2pred_id[u], i]
