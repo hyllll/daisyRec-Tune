@@ -81,10 +81,10 @@ class VAE(nn.Module):
         self.optimizer = optimizer
         self.initializer = initializer
 
-        if torch.cuda.is_available() and self.device == 'gpu':
-            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-            os.environ['CUDA_VISIBLE_DEVICES'] = str(gpuid)
-        # torch.cuda.set_device(int(gpuid)) # if internal error, try this code instead
+        # if torch.cuda.is_available() and self.device == 'gpu':
+        #     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        #     os.environ['CUDA_VISIBLE_DEVICES'] = str(gpuid)
+        torch.cuda.set_device(int(gpuid)) # if internal error, try this code instead
 
         cudnn.benchmark = True
 
