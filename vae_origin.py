@@ -96,7 +96,7 @@ if __name__ == '__main__':
     #     num_workers=8,
     #     pin_memory=True,)
 
-    model.fit()
+    model.fit(args.batch_size)
 
     elapsed_time = time.time() - s_time
     time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}_{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
