@@ -93,6 +93,7 @@ class VAE(nn.Module):
         self.user_num = user_num
         self.item_num = item_num
         self.rating_mat = rating_mat
+        self.user_record = set()
 
         p_dims = [200, 600, item_num]
         self.p_dims = p_dims
@@ -244,6 +245,7 @@ class VAE(nn.Module):
 
         
         # since there is not enough GPU memory to calculate, so we divide the data into batches, and then calculate them.
+        print("calculate result")
         row_size = self.rating_mat.shape[0]
         row_batch_size = 2048 #100
         for i in range(row_size // row_batch_size + 1):
@@ -262,6 +264,7 @@ class VAE(nn.Module):
                 self.prediction = tmp_pred
             else:
                 self.prediction = np.vstack((self.prediction, tmp_pred))
+        print("vae result complete")
 
 
     def predict(self, u, i):

@@ -3,7 +3,7 @@ import time
 import argparse
 import numpy as np
 import pandas as pd
-import scipy as sp
+import scipy.sparse as sp
 from tqdm import tqdm
 from collections import defaultdict
 import sys
