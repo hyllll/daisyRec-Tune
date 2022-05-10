@@ -433,7 +433,7 @@ if __name__ == '__main__':
     if not os.path.exists(tune_log_path):
         os.makedirs(tune_log_path)
 
-    f = open(tune_log_path + f'{args.loss_type}_{args.algo_name}_{args.dataset}_{args.prepro}_{args.val_method}.csv', 
+    f = open(tune_log_path + f'{args.loss_type}_{args.algo_name}_{args.dataset}_{args.prepro}_{args.val_method}_{args.tune_testset}.csv', 
             'w', 
             encoding='utf-8')
     if args.algo_name == 'ngcf':
