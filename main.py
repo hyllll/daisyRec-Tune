@@ -407,13 +407,13 @@ if __name__ == '__main__':
         mrr_k = mrr_at_k(tmp_preds, k)
         ndcg_k = np.mean([ndcg_at_k(r, k) for r in tmp_preds.values()])
 
-        if k == 10:
-            print(f'Precision@{k}: {pre_k:.4f}')
-            print(f'Recall@{k}: {rec_k:.4f}')
-            print(f'HR@{k}: {hr_k:.4f}')
-            print(f'MAP@{k}: {map_k:.4f}')
-            print(f'MRR@{k}: {mrr_k:.4f}')
-            print(f'NDCG@{k}: {ndcg_k:.4f}')
+        
+        print(f'Precision@{k}: {pre_k:.4f}')
+        print(f'Recall@{k}: {rec_k:.4f}')
+        print(f'HR@{k}: {hr_k:.4f}')
+        print(f'MAP@{k}: {map_k:.4f}')
+        print(f'MRR@{k}: {mrr_k:.4f}')
+        print(f'NDCG@{k}: {ndcg_k:.4f}')
 
         res[k] = np.array([pre_k, rec_k, hr_k, map_k, mrr_k, ndcg_k])
 
